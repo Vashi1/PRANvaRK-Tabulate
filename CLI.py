@@ -39,7 +39,7 @@ def list_user():
     cur.execute("select Uid, Name from payroll")
     data = cur.fetchall()
     headers = ["Uid", "Name"]
-    print(tabulate(data, headers, tablefmt = "grid"))
+    print(tabulate(data, headers, tablefmt="grid"))
 
 
 def user_manage_main():
@@ -72,7 +72,9 @@ def add_usr():
         import mysql.connector as sql
         myql = sql.connect(host='localhost', user='Rakshith', password='Rakshith1@', database="medical_store")
         print("Please input the following data!")
-        uid = int(input("Enter the Uid : "))
+        f = open("uid.txt", "r+")
+        data = int(f.read())
+        #        uid = int(input("Enter the Uid : "))
         name = input("Enter the name : ")
         d_o_j = input("Enter the Date of joining : ")
         salary = int(input("Enter the salary : "))
@@ -83,9 +85,12 @@ def add_usr():
         pa_wd = input("Enter the password for the user : ")
         cur = myql.cursor()
         cur.execute(
-            "insert into payroll values ({}, '{}', '{}', {}, '{}', {}, '{}','{}','{}')".format(uid, name, d_o_j, salary,
+            "insert into payroll values ({}, '{}', '{}', {}, '{}', {}, '{}','{}','{}')".format(data, name, d_o_j,
+                                                                                               salary,
                                                                                                address, mobile_no,
                                                                                                email, adm_right, pa_wd))
+        f.write(str(data+1))
+        f.close()
         print(cur.rowcount, "User was added")
         myql.commit()
         cho1 = input("Do you wan to continue(y/n)")
