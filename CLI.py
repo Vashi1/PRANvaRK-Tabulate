@@ -17,13 +17,11 @@ def authorisation(a, b):
             ad = 0
             print("login authorised")
             chkr = 1
-            cur.execute("select ADMIN from payroll where Uid = {0}".format(a))
+            cur.execute("select ADMIN from payroll where Uid = {}".format(a))
             admin = cur.fetchone()
-            for a in admin:
-                ad = a
-            if ad is None:
+            if admin is None or ad == [] or ad == (1,):
                 flag = 0
-            elif ad is not None:
+            elif admin != (1,):
                 flag = 1
         elif data != b:
             print("The Password is incorrect")
@@ -89,6 +87,8 @@ def add_usr():
                                                                                                salary,
                                                                                                address, mobile_no,
                                                                                                email, adm_right, pa_wd))
+        f.close()
+        f = open("uid.txt", "w")
         f.write(str(data+1))
         f.close()
         print(cur.rowcount, "User was added")
@@ -104,13 +104,12 @@ def add_usr():
 
 
 def editusr():
-    from tabulate import tabulate
     while True:
         print("Uid\tName\tD_O_J\tSalary\tAddress\tMobile_number\tE_mail\tADMIN\tPassword")
         clmn = input("Enter the column name : ")
         vlue = input("Enter the new value : ")
         uid = int(input("Enter the UID for the user : "))
-        if clmn in ["Uid", "Salary", "Mobile_number"]:
+        if clmn in ["Salary", "Mobile_number"]:
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
@@ -138,9 +137,13 @@ def editusr():
                     myql.close()
                     break
             # fixedTODO fix the problem with edit module for different datatypes
+        elif clmn == "Uid":
+            print("ERROR! Uid cannot be changed")
+            break
 
 
 def srch_usr():
+    from tabulate import tabulate
     while True:
         print("\t\t\t1.Do you search by Uid")
         print("\t\t\t2.Search by Username")
@@ -152,8 +155,8 @@ def srch_usr():
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
             cur.execute("select * from payroll where Uid = {0}".format(uid1))
-            data = cur.fetchone()
-            if data is None:
+            data = cur.fetchall()
+            if data is None or data == []:
                 print("The user does not exists")
             elif data is not None:
                 print("The user exists")
@@ -161,7 +164,9 @@ def srch_usr():
                 cho4 = input("Do you want to view further details(y/n) : ")
                 if cho4 == "y":
                     if admi == 1:
-                        print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
+                        headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN", "Password"]
+                        print(tabulate(data, headers, tablefmt="grid"))
+                        """print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
                         print(
                             "-----------------------------------------------------------------------------------------")
                         uid = data[0]
@@ -171,7 +176,7 @@ def srch_usr():
                         address = data[4]
                         mobile = data[5]
                         email = data[6]
-                        print(uid, name, doj, salary, address, mobile, email, sep='\t\t')
+                        print(uid, name, doj, salary, address, mobile, email, sep='\t\t')"""
                     elif admi == 0:
                         print("You need ADMIN Rights to view further details")
         elif cho3 == 3:
@@ -183,8 +188,8 @@ def srch_usr():
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
             cur.execute("select * from payroll where Name = '{}'".format(uid2))
-            data = cur.fetchone()
-            if data is None:
+            data = cur.fetchall()
+            if data is None or data == []:
                 print("The user does not exists")
             elif data is not None:
                 print("The user exists")
@@ -192,7 +197,10 @@ def srch_usr():
                 cho5 = input("Do you want to view more details(y/n) : ")
                 if cho5 == "y":
                     if admi == 1:
-                        print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
+                        headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN",
+                                   "Password"]
+                        print(tabulate(data, headers, tablefmt="grid"))
+                        """print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
                         print(
                             "-----------------------------------------------------------------------------------------")
                         uid = data[0]
@@ -205,7 +213,7 @@ def srch_usr():
                         print(uid, name, doj, salary, address, mobile, email, sep="\t\t")
                         # fixedTODO it shows address insted of mobile number
                         print(
-                            '-----------------------------------------------------------------------------------------')
+                            '-----------------------------------------------------------------------------------------')"""
                     elif admi == 0:
                         print("You need ADMIN Rights to view further details")
                         print()
@@ -327,6 +335,7 @@ def sales_manage_main():
 
 
 def view_order():
+    from tabulate import tabulate
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
@@ -336,12 +345,13 @@ def view_order():
         print("No orders exist")
     elif data is not None:
         headers = ["Bill_id", "C_name", "dataofsale", "mid" ,"GST", "Discount", "Price", "Quantity"]
-        print("Bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Price", "Quantity", sep="\t\t")
+        print(tabulate(data, headers, tablefmt="grid"))
+        """print("Bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Price", "Quantity", sep="\t\t")
         print("-----------------------------------------------------------------------------------------")
         for i in data:
             print(i[0], i[1] + "  ", i[2], i[3], i[4], i[5], "   ", i[6], i[7], sep="\t\t")
             print('-----------------------------------------------------------------------------------------')
-
+        """
 
 def search_order():
     import mysql.connector as sql
