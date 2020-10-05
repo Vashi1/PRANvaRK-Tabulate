@@ -104,6 +104,7 @@ def add_usr():
 
 
 def editusr():
+    from tabulate import tabulate
     while True:
         print("Uid\tName\tD_O_J\tSalary\tAddress\tMobile_number\tE_mail\tADMIN\tPassword")
         clmn = input("Enter the column name : ")
@@ -334,6 +335,7 @@ def view_order():
     if data is None or data == []:
         print("No orders exist")
     elif data is not None:
+        headers = ["Bill_id", "C_name", "dataofsale", "mid" ,"GST", "Discount", "Price", "Quantity"]
         print("Bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Price", "Quantity", sep="\t\t")
         print("-----------------------------------------------------------------------------------------")
         for i in data:
@@ -576,6 +578,7 @@ def recieve_sup_order():
 
 def list_product():
     import mysql.connector as sql
+    from tabulate import tabulate
     myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute("select * from stocks")
@@ -584,10 +587,10 @@ def list_product():
         print("The Table is empty")
     else:
         print("The data is shown below :-")
-        print("Mid", "Mname", 'Sname', "Bname", "quantity", "price", "location", "EXP_data", 'date of manufacturing',
-              sep='\t\t')
+        headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_data", 'date of manufacturing', "GST", "discount"]
+        print(tabulate(data, headers, tablefmt="grid"))
 
-        for i in range(0, cur.rowcount):
+        """for i in range(0, cur.rowcount):
             mid = data[i][0]
             mname = data[i][1]
             sname = data[i][2]
@@ -600,7 +603,7 @@ def list_product():
             # fixedTODO add the field name
             print(
                 "------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-            print(mid, mname, sname, bname, quan, price, location, expdata, D_O_M, sep="\t\t")
+            print(mid, mname, sname, bname, quan, price, location, expdata, D_O_M, sep="\t\t")"""
 
 
 def edit_product():
@@ -800,20 +803,19 @@ def del_product():
 
 def exp_product():
     import mysql.connector as sql
+    from tabulate import tabulate
     # fixedTODO add for blank
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute("select * from stocks where Exp_date < curdate()")
     data = cur.fetchall()
-    ad = 0
-    for i in data:
-        ad = i
-    if ad is None:
+    if data is None or data == []:
         print("No expired product exists")
     else:
         print("The details of expired products if given below : ")
-        print("Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", sep="\t\t")
-
+        headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M"]
+        print(tabulate(data, headers, tablefmt="grid"))
+#        print("Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", sep="\t\t")
         for i in range(0, cur.rowcount):
             mid = data[i][0]
             mname = data[i][1]
@@ -865,14 +867,14 @@ def stock_manage_main():
 
 
 def list_table():
+    from tabulate import tabulate
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute("show tables")
     data = cur.fetchall()
-    print("The tables are :-")
-    for o in data:
-        print(o)
+    headers = ["Tables"]
+    print(tabulate(data, headers, tablefmt="grid"))
 
 
 def database_manage_main():
@@ -954,14 +956,20 @@ def delete_supplier():
 
 
 def list_supplier():
-    print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
-    print('-------------------------------------------------------------------------------------')
+    from tabulate import tabulate
+    headers = ["supplier_id", "supplier_name", "phone_number", "address", "supplier_gst"]
+#    print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
+#    print('-------------------------------------------------------------------------------------')
     import mysql.connector as sql
     myql = sql.connect(host='localhost', user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute("Select * from supplier")
     data = cur.fetchall()
-    for i in range(0, cur.rowcount):
+    if data is None or data == []:
+        print("No record exists")
+    else:
+        print(tabulate(data, headers, tablefmt="grid"))
+    """for i in range(0, cur.rowcount):
         supid = data[i][0]
         supname = data[i][1]
         phno = data[i][2]
@@ -969,7 +977,7 @@ def list_supplier():
         supgst = data[i][4]
         print(supid, supname, phno, address, supgst, sep="\t\t\t     ")
         print('-------------------------------------------------------------------------------------')
-
+    """
 
 def search_supplier():
     while True:
