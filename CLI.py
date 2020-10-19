@@ -1,3 +1,4 @@
+# TODO to fix the problem in the login for non-admin user
 def authorisation(a, b):
     # FixedTODO Fix the bug regarding non-admin users in authorisation
     # flag is for ADMIN and chkr is for password
@@ -78,7 +79,7 @@ def add_usr():
         salary = int(input("Enter the salary : "))
         address = input("Enter the address : ")
         mobile_no = int(input("Enter the mobile number : "))
-        email = input("Enter the email address:")
+        email = input("Enter the email address : ")
         adm_right = input("Do you want to grant user rights(leave blank if no) : ")
         pa_wd = input("Enter the password for the user : ")
         cur = myql.cursor()
