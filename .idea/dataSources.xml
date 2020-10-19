@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Medical_store@localhost" uuid="7a830656-bac0-43e3-a851-46335bae2669">
+    <data-source source="LOCAL" name="Project" uuid="a2d3cf4e-2455-4b9d-8252-0ad53c852d61">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
+      <remarks>PRANvaRK</remarks>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/Medical_store</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/medical_store</jdbc-url>
     </data-source>
   </component>
 </project>

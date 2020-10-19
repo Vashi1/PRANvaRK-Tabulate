@@ -32,7 +32,7 @@ def authorisation(a, b):
 def list_user():
     import mysql.connector as sql
     from tabulate import tabulate
-    myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="Medical_store")
+    myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute("select Uid, Name from payroll")
     data = cur.fetchall()
@@ -597,7 +597,7 @@ def list_product():
         print("The Table is empty")
     else:
         print("The data is shown below :-")
-        headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_data", 'date of manufacturing', "GST", "discount"]
+        headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_date", 'date of manufacturing', "GST", "discount"]
         print(tabulate(data, headers, tablefmt="grid"))
 
         """for i in range(0, cur.rowcount):
@@ -619,10 +619,10 @@ def list_product():
 def edit_product():
     while True:
         mid = input("Enter the Mid of the Product : ")
-        print("Mid Mname Saltname Brandname Quantity Price Location Exp_date D_O_P GST discount")
+        print("Mid Mname Saltname Brandname Quantity Price Location Exp_date D_O_M GST discount")
         fname = input("Enter the field name : ")
         val = input("Enter the new value : ")
-        char_fields = ['Saltname', 'Brandname', 'Location', "Exp_date"]
+        char_fields = ['Saltname', 'Brandname', 'Location', "Exp_date", "D_O_M"]
         if fname in char_fields:
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
