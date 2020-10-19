@@ -136,7 +136,7 @@ def editusr():
             elif cho2 == "n":
                 myql.close()
                 break
-            # TODO fix the problem with edit module for different datatypes
+            # fixedTODO fix the problem with edit module for different datatypes
         elif clmn == "Uid":
             print("ERROR! Uid cannot be changed")
             break
