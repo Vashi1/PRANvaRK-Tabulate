@@ -124,24 +124,24 @@ def editusr():
                 myql.close()
                 break
         elif clmn in ["Name", "D_O_J", "Address", "E_mail", "ADMIN", "Password"]:
-            if clmn in ["Uid", "Salary", "Mobile_number"]:
-                import mysql.connector as sql
-                myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
-                cur = myql.cursor()
-                cur.execute("update payroll set {0} = '{1}' where Uid = {2}".format(clmn, vlue, uid))
-                print(cur.rowcount, "column was modified")
-                myql.commit()
-                cho2 = input("Do you want to continue(y/n) : ")
-                if cho2 == 'y':
-                    pass
-                elif cho2 == "n":
-                    myql.close()
-                    break
-            # fixedTODO fix the problem with edit module for different datatypes
+            import mysql.connector as sql
+            myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
+            cur = myql.cursor()
+            cur.execute("update payroll set {0} = '{1}' where Uid = {2}".format(clmn, vlue, uid))
+            print(cur.rowcount, "column was modified")
+            myql.commit()
+            cho2 = input("Do you want to continue(y/n) : ")
+            if cho2 == 'y':
+                pass
+            elif cho2 == "n":
+                myql.close()
+                break
+            # TODO fix the problem with edit module for different datatypes
         elif clmn == "Uid":
             print("ERROR! Uid cannot be changed")
             break
-
+        else:
+            print("Please enter a valid input!")
 
 def srch_usr():
     from tabulate import tabulate
