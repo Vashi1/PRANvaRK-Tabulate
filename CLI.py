@@ -1,4 +1,4 @@
-# TODO to fix the problem in the login for non-admin user
+#fixed TODO to fix the problem in the login for non-admin user
 def authorisation(a, b):
     # FixedTODO Fix the bug regarding non-admin users in authorisation
     # flag is for ADMIN and chkr is for password
@@ -8,11 +8,11 @@ def authorisation(a, b):
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor(buffered=True)
     cur.execute("select Password from payroll where Uid = {}".format(a))
-    data = cur.fetchone()
-    if data is None:
+    d = cur.fetchone()
+    if d is None:
         print("login not authorised! Please try again")
-    elif data is not None:
-        for c in data:
+    elif d is not None:
+        for c in d:
             data = c
         if data == b:
             ad = 0
@@ -20,24 +20,23 @@ def authorisation(a, b):
             chkr = 1
             cur.execute("select ADMIN from payroll where Uid = {}".format(a))
             admin = cur.fetchone()
-            if admin is None or ad == [] or ad == (1,):
-                flag = 0
-            elif admin != (1,):
+            if admin[0].lower() == "no":
                 flag = 1
         elif data != b:
             print("The Password is incorrect")
     # FixedTODO remove debugging prints after this
+
     return flag, chkr
 
-
+# TODO Show Password and Admin
 def list_user():
     import mysql.connector as sql
     from tabulate import tabulate
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
-    cur.execute("select Uid, Name from payroll")
+    cur.execute("select Uid, Name, ADMIN, Password from payroll")
     data = cur.fetchall()
-    headers = ["Uid", "Name"]
+    headers = ["Uid", "Name", "ADMIN", "Password"]
     print(tabulate(data, headers, tablefmt="grid"))
 
 
@@ -80,7 +79,7 @@ def add_usr():
         address = input("Enter the address : ")
         mobile_no = int(input("Enter the mobile number : "))
         email = input("Enter the email address : ")
-        adm_right = input("Do you want to grant user rights(leave blank if no) : ")
+        adm_right = input("Do you want to grant user rights(yes/no) : ")
         pa_wd = input("Enter the password for the user : ")
         cur = myql.cursor()
         cur.execute(
@@ -314,7 +313,7 @@ def add_order():
     #   #Tp = int(input("Enter the Total Price"))
 
 
-# TODO add order recieve order
+# fixedTODO add order recieve order
 
 def sales_manage_main():
     while True:
@@ -417,48 +416,22 @@ def search_order():
 # Not working
 def add_sup_order():
     while True:
-        from datetime import date
-        today = date.today()
-        d1 = today.strftime("%Y-%m-%d")
-        print("Enter the following data!")
-        # midi = int(input("Enter the Mid : "))
-        f = open("Supply.txt", "r+")
-        data = int(f.read())
-        f.close()
-        supid = input("Enter the supplier id: ")
-        mid = input("Enter the Mid : ")
-        import mysql.connector as sql
-        myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
-        cur = myql.cursor()
-        cur.execute("select * from stocks where Mid = {}".format(mid))
-        data_db = cur.fetchall()
-        if data_db is None or data_db == []:
-            mname = input("Enter the Mname : ")
-            salt_nme = input("Enter the salt name : ")
-            b_name = input("Enter the Brand name : ")
-            quan = int(input("Enter the quantity : "))
-            price = int(input("Enter the cost : "))
-            # location = input("Enter the storage location : ")
-            # TODO add the location as "Not specified" in the query
-            location = "Not specified"
-            expdate = input("Enter the expiry data : ")
-            dod = input("Enter the Date_of_Delievery : ")
-            GST = input("Enter the GST value : ")
-            stat = 0
-            discount = 0
-            # TODO add the discount as 0 
-            # supid = input("Enter the supplier id : ")
-            # supname = input("Enter the supplier name : ")
-            # sup_gst = input("Enter supplier's GST number")
+        choice = input("Do you want to add an existing product(1) or a non existing product(2) : ")
+        if choice == "1":
+            from datetime import date
+            today = date.today()
+            d1 = today.strftime("%Y-%m-%d")
+            print("Enter the following data!")
+            # midi = int(input("Enter the Mid : "))
+            f = open("Supply.txt", "r+")
+            data = int(f.read())
+            f.close()
+            supid = input("Enter the supplier id: ")
+            mid = input("Enter the Mid : ")
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
             cur = myql.cursor()
-            cur.execute(
-                "insert into supplier_data values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', '{}', {}, {}, {})".format(
-                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location, expdate, GST, discount,
-                    stat))
-            myql.commit()
-        elif data_db is not None or data_db != []:
+            # Existing
             print("The data is shown below :-")
             print("Mid", "Mname", 'Sname', "Bname", "Existing quantity", "price", "location", "EXP_data",
                   'date of manufacturing',
@@ -486,12 +459,39 @@ def add_sup_order():
                     data, d1, supid, mid, ch, price, dod, mname, sname, bname, location, expdata, D_O_M, gst, discount,
                     stat))
             myql.commit()
-        print(cur.rowcount, "Order was added")
-        myql.commit()
-        f = open("Supply.txt", "w+")
-        data = data + 1
-        f.write(str(data))
-        f.close()
+            print(cur.rowcount, "Order was added")
+            myql.commit()
+            f = open("Supply.txt", "w+")
+            data = data + 1
+            f.write(str(data))
+            f.close()
+        elif choice == "2":
+            # Non-existing
+            mname = input("Enter the Mname : ")
+            salt_nme = input("Enter the salt name : ")
+            b_name = input("Enter the Brand name : ")
+            quan = int(input("Enter the quantity : "))
+            price = int(input("Enter the cost : "))
+            # location = input("Enter the storage location : ")
+            # TODO add the location as "Not specified" in the query
+            location = "Not specified"
+            expdate = "0000-00-00"
+            dod = input("Enter the Date_of_Delievery : ")
+            GST = input("Enter the GST value : ")
+            stat = 0
+            discount = 0
+            # TODO add the discount as 0
+            # supid = input("Enter the supplier id : ")
+            # supname = input("Enter the supplier name : ")
+            # sup_gst = input("Enter supplier's GST number")
+            import mysql.connector as sql
+            myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
+            cur = myql.cursor()
+            cur.execute(
+                "insert into supplier_data values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', '{}', {}, {}, {})".format(
+                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location, expdate, GST, discount,
+                    stat))
+            myql.commit()
         ch = input("Do you want to continue(y/n) : ")
         if ch == "y":
             pass
@@ -674,6 +674,7 @@ def search_product():
         ch = input("Enter your choice : ")
         if ch == "1":
             while True:
+                from  tabulate import tabulate
                 inp = int(input("Enter the Mid :"))
                 import mysql.connector as sql
                 myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
@@ -686,7 +687,7 @@ def search_product():
                 if data == [] or data is None:
                     print("The product is not available in inventory")
                     break
-                elif ad != 0:
+                else:
                     print("The product is available in the inventory")
                     ch1 = input("Do you want to view more information(y/n) : ")
                     if ch1 == "y":
@@ -826,20 +827,17 @@ def exp_product():
         print("The details of expired products if given below : ")
         headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M"]
         print(tabulate(data, headers, tablefmt="grid"))
-#        print("Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", sep="\t\t")
-        for i in range(0, cur.rowcount):
-            mid = data[i][0]
-            mname = data[i][1]
-            saltname = data[i][2]
-            brandname = data[i][3]
-            quantity = data[i][4]
-            price = data[i][5]
-            location = data[i][6]
-            expdate = data[i][7]
-            dom = data[i][8]
-            print(
-                "------------------------------------------------------------------------------------------------------------------------------------")
-            print(mid, mname, saltname, brandname, quantity, price, location, expdate, dom, sep="\t\t\t")
+
+
+def disp_sup_order():
+    import mysql.connector as sql
+    from tabulate import tabulate
+    myql = sql.connect(host='localhost', user="Rakshith", password="Rakshith1@", database="medical_store")
+    cur = myql.cursor()
+    cur.execute('select * from supplier_data')
+    data = cur.fetchall()
+    headers = ['orderid', 'order_date', 'supplier_id', 'Mid', "Quantity", "Price", "Delievery_date", "Mname", "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status"]
+    print(tabulate(data, headers, tablefmt="grid"))
 
 
 # TODO fix the whole stock management module
@@ -853,7 +851,8 @@ def stock_manage_main():
         # fixedTODO add a module to show all expired products
         print("\t\t\t6.Show Expired Products")
         print("\t\t\t7.Receive Supply Order")
-        print("\t\t\t8.Back(Main Menu)")
+        print("\t\t\t8.Show all supplier orders")
+        print("\t\t\t9.Back(Main Menu)")
         ch1 = input("\t\tEnter your choice : ")
         if ch1 == "1":
             # Doesn't Work anymore
@@ -869,13 +868,14 @@ def stock_manage_main():
         elif ch1 == "6":
             exp_product()
         elif ch1 == "8":
-            break
+            disp_sup_order()
         # Doesn't exist anymore
         elif ch1 == "7":
             recieve_sup_order()
+        elif ch1 == "9":
+            break
         else:
             print("Please enter a valid input!")
-
 
 def list_table():
     from tabulate import tabulate
@@ -946,14 +946,14 @@ def add_supplier():
 
 def delete_supplier():
     print("1.Delete by supplier_id")
-    print("2.Delete by Supplier_name")
+    print("2.Delete by supplier_name")
     ch = int(input("Enter your choice : "))
     if ch == 1:
         sid = int(input("Enter the supplier_id : "))
         import mysql.connector as sql
         myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
         cur = myql.cursor()
-        cur.execute("delete from Supplier where supplier_id = {}".format(sid))
+        cur.execute("delete from supplier where supplier_id = {}".format(sid))
         myql.commit()
         print(cur.rowcount, "supplier was deleted")
     if ch == 2:
@@ -961,7 +961,7 @@ def delete_supplier():
         import mysql.connector as sql
         myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
         cur = myql.cursor()
-        cur.execute("delete from Supplier where supplier_name ='{}'".format(supname))
+        cur.execute("delete from supplier where supplier_name ='{}'".format(supname))
         myql.commit()
         print(cur.rowcount, "supplier was deleted")
 
@@ -991,6 +991,7 @@ def list_supplier():
     """
 
 def search_supplier():
+    from tabulate import tabulate
     while True:
         print("1.Search by supplier_id")
         print("2.Search by supplier_name")
@@ -1007,9 +1008,8 @@ def search_supplier():
                 print("No such supplier exists")
             elif data is not None or data != []:
                 print("The supplier exists!")
-                print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
-                print('-------------------------------------------------------------------------------------')
-                print(data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], sep="\t\t\t\t  ")
+                headers = ['supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst']
+                print(tabulate(data, headers, tablefmt='grid'))
         elif ch == "2":
             sup_name = input("Enter the supplier_name : ")
             import mysql.connector as sql
@@ -1020,9 +1020,8 @@ def search_supplier():
             if data is None or data == []:
                 print("No such supplier exists")
             elif data is not None or data != []:
-                print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
-                print('-------------------------------------------------------------------------------------')
-                print(data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], sep="\t\t\t\t  ")
+                headers = ['supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst']
+                print(tabulate(data, headers, tablefmt='grid'))
         elif ch == '3':
             break
         else:
@@ -1110,7 +1109,7 @@ def stock_manage_mini():
 user = int(input("Enter the Userid : "))
 pass_chk = input("Enter the password : ")
 admi, chk = authorisation(user, pass_chk)
-if admi == 1 and chk == 1:
+if admi == 0 and chk == 1:
     while True:
         print("Main Menu")
         print("\t\t\t1.User Management")
@@ -1134,7 +1133,7 @@ if admi == 1 and chk == 1:
             print("Good Bye!")
             break
 
-elif admi == 0 and chk == 1:
+elif admi == 1 and chk == 1:
     while True:
         print("Main Menu")
         print("\t\t\t1.User Management")
