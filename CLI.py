@@ -154,7 +154,7 @@ def srch_usr():
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
-            cur.execute("select * from payroll where Uid = {0}".format(uid1))
+            cur.execute("select Uid, Name, D_O_J, Salary, Address, Mobile_number, E_mail, ADMIN from payroll where Uid = {0}".format(uid1))
             data = cur.fetchall()
             if data is None or data == []:
                 print("The user does not exists")
@@ -163,22 +163,8 @@ def srch_usr():
                 # The admi will tell whether the logged in user has admin rights
                 cho4 = input("Do you want to view further details(y/n) : ")
                 if cho4 == "y":
-                    if admi == 1:
-                        headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN", "Password"]
-                        print(tabulate(data, headers, tablefmt="grid"))
-                        """print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
-                        print(
-                            "-----------------------------------------------------------------------------------------")
-                        uid = data[0]
-                        name = data[1]
-                        doj = data[2]
-                        salary = data[3]
-                        address = data[4]
-                        mobile = data[5]
-                        email = data[6]
-                        print(uid, name, doj, salary, address, mobile, email, sep='\t\t')"""
-                    elif admi == 0:
-                        print("You need ADMIN Rights to view further details")
+                    headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN"]
+                    print(tabulate(data, headers, tablefmt="grid"))
         elif cho3 == 3:
             break
         # fixedTODO fix the bug in search by mname and saltname
@@ -187,36 +173,19 @@ def srch_usr():
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
-            cur.execute("select * from payroll where Name = '{}'".format(uid2))
+            cur.execute(
+                "select Uid, Name, D_O_J, Salary, Address, Mobile_number, E_mail, ADMIN from payroll where Name = '{0}'".format(
+                    uid2))
             data = cur.fetchall()
             if data is None or data == []:
                 print("The user does not exists")
             elif data is not None:
                 print("The user exists")
-                # Again ask for the user for his choice
-                cho5 = input("Do you want to view more details(y/n) : ")
-                if cho5 == "y":
-                    if admi == 1:
-                        headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN",
-                                   "Password"]
-                        print(tabulate(data, headers, tablefmt="grid"))
-                        """print("Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", sep='\t\t')
-                        print(
-                            "-----------------------------------------------------------------------------------------")
-                        uid = data[0]
-                        name = data[1]
-                        doj = data[2]
-                        salary = data[3]
-                        address = data[4]
-                        mobile = data[5]
-                        email = data[6]
-                        print(uid, name, doj, salary, address, mobile, email, sep="\t\t")
-                        # fixedTODO it shows address insted of mobile number
-                        print(
-                            '-----------------------------------------------------------------------------------------')"""
-                    elif admi == 0:
-                        print("You need ADMIN Rights to view further details")
-                        print()
+                # The admi will tell whether the logged in user has admin rights
+                cho4 = input("Do you want to view further details(y/n) : ")
+                if cho4 == "y":
+                    headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN"]
+                    print(tabulate(data, headers, tablefmt="grid"))
 
 
 def del_usr():
@@ -426,11 +395,16 @@ def add_sup_order():
             f = open("Supply.txt", "r+")
             data = int(f.read())
             f.close()
+            a = open("order_sp.txt", "r")
+            order_sp = int(a.read())
+            a.close()
             supid = input("Enter the supplier id: ")
             mid = input("Enter the Mid : ")
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
             cur = myql.cursor()
+            cur.execute("select * from stocks where Mid = {}".format(mid))
+            data_db = cur.fetchone()
             # Existing
             print("The data is shown below :-")
             print("Mid", "Mname", 'Sname', "Bname", "Existing quantity", "price", "location", "EXP_data",
@@ -455,9 +429,9 @@ def add_sup_order():
             ch = int(input("Enter the quantity to be ordered : "))
             dod = input("Enter the date of delivery : ")
             cur.execute(
-                "insert into supplier_data values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', '{}', {}, {}, {})".format(
-                    data, d1, supid, mid, ch, price, dod, mname, sname, bname, location, expdata, D_O_M, gst, discount,
-                    stat))
+                "insert into supplier_data(orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date, Mname, Saltname, Brandname, Location, GST, discount, status, order_sp) values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', {}, {}, {}, {})".format(
+                    data, d1, supid, mid, ch, price, dod, mname, sname, bname, location, GST, discount,
+                    stat, order_sp))
             myql.commit()
             print(cur.rowcount, "Order was added")
             myql.commit()
@@ -466,7 +440,15 @@ def add_sup_order():
             f.write(str(data))
             f.close()
         elif choice == "2":
+            from datetime import date
             # Non-existing
+            today = date.today()
+            supid = input("Enter the supplier id: ")
+            d1 = today.strftime("%Y-%m-%d")
+            f = open("Supply.txt", "r+")
+            data = int(f.read())
+            f.close()
+            mid = 0
             mname = input("Enter the Mname : ")
             salt_nme = input("Enter the salt name : ")
             b_name = input("Enter the Brand name : ")
@@ -477,9 +459,11 @@ def add_sup_order():
             location = "Not specified"
             expdate = "0000-00-00"
             dod = input("Enter the Date_of_Delievery : ")
-            GST = input("Enter the GST value : ")
+            GST = 0
             stat = 0
             discount = 0
+            a = open("order_sp.txt", "r+")
+            order_sp = int(a.read())
             # TODO add the discount as 0
             # supid = input("Enter the supplier id : ")
             # supname = input("Enter the supplier name : ")
@@ -488,33 +472,40 @@ def add_sup_order():
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
             cur = myql.cursor()
             cur.execute(
-                "insert into supplier_data values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', '{}', {}, {}, {})".format(
-                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location, expdate, GST, discount,
-                    stat))
+                "insert into supplier_data(orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date, Mname, Saltname, Brandname, Location, GST, discount, status, order_sp) values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', {}, {}, {}, {})".format(
+                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location,GST, discount,
+                    stat, order_sp))
             myql.commit()
+            f = open("Supply.txt", "w+")
+            data = data + 1
+            f.write(str(data))
+            f.close()
         ch = input("Do you want to continue(y/n) : ")
         if ch == "y":
             pass
         elif ch == "n":
+            a = open("order_sp.txt", "w")
+            order_sp += 1
+            a.write(str(order_sp))
+            a.close()
             break
         else:
             print("Please enter a valid input!")
 
 
 def recieve_sup_order():
-    oid = int(input("Enter the order_id : "))
+    oid0 = int(input("Enter the order_id : "))
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute(
-        "select orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date from supplier_data where orderid = {}".format(
-            oid))
+        "select orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date from supplier_data where order_sp = {}".format(oid0))
     data = cur.fetchall()
     if data == None or data == []:
         print("The Table is empty")
     else:
         print("The data is shown below :-")
-        print("orderid", "order_date", 'supplier_id', "Mid", "Quantity", "Price", "Delievery_date", sep='\t\t')
+        print("orderid", "order_date", 'supplier_id', "Quantity", "Price", "Delievery_date", sep='\t\t')
         for i in range(0, cur.rowcount):
             oid = data[i][0]
             odate = data[i][1]
@@ -526,13 +517,14 @@ def recieve_sup_order():
             # fixedTODO add the field name
             print(
                 "------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-            print(oid, odate, supid, mid, quan, price, Delievery_date, sep="\t\t")
+            print(oid0, odate, supid, quan, price, Delievery_date, sep="\t\t")
         ch = input("Do you want to continue(y/n) : ")
         if ch == "y":
-            cur.execute("select status from supplier_data where mid = {}".format(mid))
+            cur.execute("select status from supplier_data where orderid = {}".format(oid))
             data = cur.fetchall()
+            print(data)
             if data[0][0] == 1:
-                cur.execute('select Mid, Quantity from supplier_data')
+                cur.execute('select Mid, Quantity, Saltname from supplier_data')
                 data_sup_data = cur.fetchall()
                 for i in range(0, cur.rowcount):
                     mid = data_sup_data[i][0]
@@ -543,11 +535,10 @@ def recieve_sup_order():
                     myql.commit()
             elif data[0][0] == 0:
                 cur.execute(
-                    'select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data')
+                    "select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data where order_sp = {}".format(oid0))
                 data_sup_data = cur.fetchall()
                 f = open("Mid.txt", "r")
                 daa = int(f.read())
-                print(daa, type(daa))
                 f.close()
                 for i in range(0, cur.rowcount):
                     mname = data_sup_data[i][1]
@@ -556,11 +547,10 @@ def recieve_sup_order():
                     quant = data_sup_data[i][4]
                     pric = data_sup_data[i][5]
                     loca = data_sup_data[i][6]
-                    expdata = data_sup_data[i][7]
+                    expdata = input("Enter the expiry date :")
                     order_da = data_sup_data[i][8]
-                    gst = data_sup_data[i][9]
-                    disco = data_sup_data[i][10]
-                    print(disco)
+                    gst = int(input("Enter the GST value : "))
+                    disco = int(input("Enter the discount value : "))
                     cur.execute(
                         "insert into stocks values({}, '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', {}, {})".format(daa,
                                                                                                                    mname,
@@ -574,8 +564,8 @@ def recieve_sup_order():
                                                                                                                    gst,
                                                                                                                    disco))
                     myql.commit()
-                    print("cur.rowcount")
-                    cur.execute("update supplier_data set status = 2 where mid = {}".format(daa))
+                    print(cur.rowcount)
+                    cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
                     myql.commit()
                 f = open("Mid.txt", "w")
                 daa += 1
@@ -825,7 +815,7 @@ def exp_product():
         print("No expired product exists")
     else:
         print("The details of expired products if given below : ")
-        headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M"]
+        headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", "GST", "discount"]
         print(tabulate(data, headers, tablefmt="grid"))
 
 
@@ -836,7 +826,7 @@ def disp_sup_order():
     cur = myql.cursor()
     cur.execute('select * from supplier_data')
     data = cur.fetchall()
-    headers = ['orderid', 'order_date', 'supplier_id', 'Mid', "Quantity", "Price", "Delievery_date", "Mname", "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status"]
+    headers = ['orderid', 'order_date', 'supplier_id', 'Mid', "Quantity", "Price", "Delievery_date", "Mname", "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status", "order_sp"]
     print(tabulate(data, headers, tablefmt="grid"))
 
 
