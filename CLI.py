@@ -226,6 +226,7 @@ def add_order():
     # discount = int(input("Enter the discount per piece(if any) : "))
     while True:
         tp = 0
+        # TODO add a case when the mid does not exists
         gtp = 0
         """cur.execute("Select Mname, Quantity from stocks")
         data = cur.fetchall()
@@ -234,10 +235,11 @@ def add_order():
         # for i in data:
         # print(i)
         mid = input("Enter the Mid of the product : ")
-        cur.execute("select Quantity from stocks where Mid = {}".format(mid))
+        cur.execute("select Quantity from stocks where mid = {}".format(mid))
         daa = cur.fetchall()
-        cur.execute("select GST from stocks where Mid = {}".format(mid))
+        cur.execute("select GST from stocks where mid = {}".format(mid))
         daaa = cur.fetchall()
+        print(daa)
         gst = daaa[0][0]
         a = daa[0][0]
         cur.execute("select discount from stocks where Mid = {}".format(mid))
@@ -257,7 +259,7 @@ def add_order():
             ch = input("Do you want to continue(y/n)?")
             if ch == "y" or ch == "Y":
                 cur.execute(
-                    "insert into bill_detail values({}, '{}', '{}', {}, {}, {}, {}, {})".format(sid, d1, c_name, mid,
+                    "insert into bill_detail values({}, '{}', '{}', {}, {}, {}, {}, {})".format(sid, c_name, d1, mid,
                                                                                                 gst, discount, gtp,
                                                                                                 quan))
                 myql.commit()
@@ -265,18 +267,17 @@ def add_order():
             elif ch == "n" or ch == "N":
                 # tp = tp - ((discount * tp) / 100)
                 cur.execute(
-                    "insert into bill_detail values({}, '{}', '{}', {}, {}, {}, {}, {})".format(sid, d1, c_name, mid,
+                    "insert into bill_detail values({}, '{}', '{}', {}, {}, {}, {}, {})".format(sid, c_name, d1, mid,
                                                                                                 gst, discount, gtp,
                                                                                                 quan))
                 myql.commit()
                 cur.execute(
-                    "insert into Sales values({}, '{}', '{}', {}, {}, {})".format(sid, c_name, d1, tp, gst, discount))
-                f = open("Sales_id.txt", "w")
-                f.write(str(sid))
-                f.close()
-                myql.commit()
-                break
-
+                    "insert into sales values({}, '{}', {}, '{}')".format(sid, c_name, tp, d1))
+            f = open("Sales_id.txt", "w")
+            f.write(str(sid))
+            f.close()
+            myql.commit()
+            break
         else:
             print("Please check the stocks again!")
     #   #Tp = int(input("Enter the Total Price"))
@@ -313,6 +314,7 @@ def view_order():
     if data is None or data == []:
         print("No orders exist")
     elif data is not None:
+        headers
         headers = ["Bill_id", "C_name", "dataofsale", "mid" ,"GST", "Discount", "Price", "Quantity"]
         print(tabulate(data, headers, tablefmt="grid"))
         """print("Bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Price", "Quantity", sep="\t\t")
@@ -404,7 +406,7 @@ def add_sup_order():
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
             cur = myql.cursor()
             cur.execute("select * from stocks where Mid = {}".format(mid))
-            data_db = cur.fetchone()
+            data_db = cur.fetchall()
             # Existing
             print("The data is shown below :-")
             print("Mid", "Mname", 'Sname', "Bname", "Existing quantity", "price", "location", "EXP_data",
@@ -430,7 +432,7 @@ def add_sup_order():
             dod = input("Enter the date of delivery : ")
             cur.execute(
                 "insert into supplier_data(orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date, Mname, Saltname, Brandname, Location, GST, discount, status, order_sp) values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', {}, {}, {}, {})".format(
-                    data, d1, supid, mid, ch, price, dod, mname, sname, bname, location, GST, discount,
+                    data, d1, supid, mid, ch, price, dod, mname, sname, bname, location, gst, discount,
                     stat, order_sp))
             myql.commit()
             print(cur.rowcount, "Order was added")
@@ -567,10 +569,10 @@ def recieve_sup_order():
                     print(cur.rowcount)
                     cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
                     myql.commit()
-                f = open("Mid.txt", "w")
-                daa += 1
-                f.write(str(daa))
-                f.close()
+                    f = open("Mid.txt", "w")
+                    daa += 1
+                    f.write(str(daa))
+                    f.close()
             elif data[0][0] == 2:
                 print("The order is already added")
         if ch == "n":
