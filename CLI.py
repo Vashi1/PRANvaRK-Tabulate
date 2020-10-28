@@ -1,10 +1,11 @@
-#fixed TODO to fix the problem in the login for non-admin user
+# fixed TODO to fix the problem in the login for non-admin user
 def authorisation(a, b):
     # FixedTODO Fix the bug regarding non-admin users in authorisation
     # flag is for ADMIN and chkr is for password
     import mysql.connector as sql
     flag = 0
     chkr = 0
+    data = 0
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor(buffered=True)
     cur.execute("select Password from payroll where Uid = {}".format(a))
@@ -15,7 +16,6 @@ def authorisation(a, b):
         for c in d:
             data = c
         if data == b:
-            ad = 0
             print("login authorised")
             chkr = 1
             cur.execute("select ADMIN from payroll where Uid = {}".format(a))
@@ -28,7 +28,8 @@ def authorisation(a, b):
 
     return flag, chkr
 
-# TODO Show Password and Admin
+
+# fixed TODO Show Password and Admin
 def list_user():
     import mysql.connector as sql
     from tabulate import tabulate
@@ -89,7 +90,7 @@ def add_usr():
                                                                                                email, adm_right, pa_wd))
         f.close()
         f = open("uid.txt", "w")
-        f.write(str(data+1))
+        f.write(str(data + 1))
         f.close()
         print(cur.rowcount, "User was added")
         myql.commit()
@@ -142,6 +143,7 @@ def editusr():
         else:
             print("Please enter a valid input!")
 
+
 def srch_usr():
     from tabulate import tabulate
     while True:
@@ -154,7 +156,9 @@ def srch_usr():
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user='Rakshith', password="Rakshith1@", database='medical_store')
             cur = myql.cursor()
-            cur.execute("select Uid, Name, D_O_J, Salary, Address, Mobile_number, E_mail, ADMIN from payroll where Uid = {0}".format(uid1))
+            cur.execute(
+                "select Uid, Name, D_O_J, Salary, Address, Mobile_number, E_mail, ADMIN from payroll where Uid = {0}".format(
+                    uid1))
             data = cur.fetchall()
             if data is None or data == []:
                 print("The user does not exists")
@@ -271,8 +275,11 @@ def add_order():
                                                                                                 gst, discount, gtp,
                                                                                                 quan))
                 myql.commit()
+                cur.execute("select sum(tp) from bill_detail where Bill_id = {} group by Bill_id".format(sid))
+                total_price = cur.fetchone()
+                print("total price", total_price[0])
                 cur.execute(
-                    "insert into sales values({}, '{}', {}, '{}')".format(sid, c_name, tp, d1))
+                    "insert into sales values({}, '{}', {}, '{}')".format(sid, c_name, total_price[0], d1))
             f = open("Sales_id.txt", "w")
             f.write(str(sid))
             f.close()
@@ -309,80 +316,38 @@ def view_order():
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
-    cur.execute("Select bill_id, Cust_name, bill_date, mid, GST_val, DIS, tp, Quantity  from bill_detail")
+    cur.execute("Select * from sales")
     data = cur.fetchall()
     if data is None or data == []:
         print("No orders exist")
     elif data is not None:
-        headers
-        headers = ["Bill_id", "C_name", "dataofsale", "mid" ,"GST", "Discount", "Price", "Quantity"]
+        headers = ["Bill_id", "C_name", "Total Price", "Date_of_sale"]
         print(tabulate(data, headers, tablefmt="grid"))
-        """print("Bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Price", "Quantity", sep="\t\t")
-        print("-----------------------------------------------------------------------------------------")
-        for i in data:
-            print(i[0], i[1] + "  ", i[2], i[3], i[4], i[5], "   ", i[6], i[7], sep="\t\t")
-            print('-----------------------------------------------------------------------------------------')
-        """
 
 def search_order():
     import mysql.connector as sql
+    from tabulate import tabulate
+    bid = int(input("Enter the bill_id : "))
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
-    print("1.Search by bill_id")
-    print("2.Search by C_name")
-    ch = input("Enter your choice : ")
-    if ch == "1":
-        sid = int(input("Enter the bill_id : "))
-        cur.execute(
-            "select bill_id, Cust_name, bill_date, mid, GST_val, DIS, Quantity from bill_detail where bill_id = {}".format(
-                sid))
-        data = cur.fetchall()
-        if data is None or data == []:
-            print("The Order does not exists")
-        elif data is not None:
-            print("bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Quantity", sep="\t\t\t")
-            print(
-                "---------------------------------------------------------------------------------------------------------")
-            for i in data:
-                print(i[0], ' ', i[1] + "  ", i[2], ' ', i[3], ' ', i[4], ' ', i[5], "   ", i[6], sep="\t\t")
-                print(
-                    '---------------------------------------------------------------------------------------------------------')
-            cur.execute(
-                "select sum(tp) as 'Total price' from bill_detail group by bill_id having bill_id = {}".format(sid))
-            a = cur.fetchall()
-            print("\n")
-            print("Total Price")
-            print("-----------")
-            print(a[0][0])
-            print("-----------")
-            print("\n")
-    elif ch == "2":
-        cname = input("Enter the C_name : ")
-        cur.execute(
-            "select bill_id, Cust_name, bill_date, mid, GST_val, DIS, Quantity from bill_detail where Cust_name = '{}'".format(
-                cname))
-        data = cur.fetchall()
-        if data is None or data == []:
-            print("The order does not exists")
+    cur.execute("select * from sales where sale_id = {}".format(bid))
+    data = cur.fetchall()
+    if data is None or data == []:
+        print("No such order exists")
+    else:
+        headers = ["sale_id", "C_name", "Total_Price", "D_O_S"]
+        print(tabulate(data, headers, tablefmt="grid"))
+        choice = input("Do you want to view further details?(yes/no) : ")
+        if choice.lower() == "no":
+            pass
+        elif choice.lower() =="yes":
+            cur.execute("select * from bill_detail where Bill_id = {}".format(bid))
+            dat = cur.fetchall()
+            headers = ["Bill_id", "Cust_name", "bill_date", "mid", "GST_val", "Dis", "tp", "Quantity"]
+            print(tabulate(dat, headers, tablefmt="grid"))
         else:
-            print("bill_id", "C_name", "dateofsale", "mid", "GST", 'Discount', "Quantity", sep="\t\t\t")
-            print(
-                "---------------------------------------------------------------------------------------------------------")
-            for i in data:
-                print(i[0], ' ', i[1] + "  ", i[2], ' ', i[3], ' ', i[4], ' ', i[5], "   ", i[6], sep="\t\t")
-                print(
-                    '---------------------------------------------------------------------------------------------------------')
-            cur.execute(
-                "select sum(tp) as 'Total price' from bill_detail group by Cust_name having Cust_name = '{}'".format(
-                    cname))
-            a = cur.fetchall()
-            print("\n")
-            print("Total Price")
-            print("-----------")
-            print(a[0][0])
-            print("-----------")
-            print("\n")
-
+            print("Please enter a valid input")
+# TODO the search module needs a rewrite
 
 # Not working
 def add_sup_order():
@@ -475,7 +440,7 @@ def add_sup_order():
             cur = myql.cursor()
             cur.execute(
                 "insert into supplier_data(orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date, Mname, Saltname, Brandname, Location, GST, discount, status, order_sp) values({},'{}',{},{},{},{},'{}','{}', '{}', '{}', '{}', {}, {}, {}, {})".format(
-                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location,GST, discount,
+                    data, d1, supid, mid, quan, price, dod, mname, salt_nme, b_name, location, GST, discount,
                     stat, order_sp))
             myql.commit()
             f = open("Supply.txt", "w+")
@@ -497,11 +462,13 @@ def add_sup_order():
 
 def recieve_sup_order():
     oid0 = int(input("Enter the order_id : "))
+    oid = 0
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
     cur.execute(
-        "select orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date from supplier_data where order_sp = {}".format(oid0))
+        "select orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date from supplier_data where order_sp = {}".format(
+            oid0))
     data = cur.fetchall()
     if data == None or data == []:
         print("The Table is empty")
@@ -537,7 +504,8 @@ def recieve_sup_order():
                     myql.commit()
             elif data[0][0] == 0:
                 cur.execute(
-                    "select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data where order_sp = {}".format(oid0))
+                    "select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data where order_sp = {}".format(
+                        oid0))
                 data_sup_data = cur.fetchall()
                 f = open("Mid.txt", "r")
                 daa = int(f.read())
@@ -590,7 +558,8 @@ def list_product():
         print("The Table is empty")
     else:
         print("The data is shown below :-")
-        headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_date", 'date of manufacturing', "GST", "discount"]
+        headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_date",
+                   'date of manufacturing', "GST", "discount"]
         print(tabulate(data, headers, tablefmt="grid"))
 
         """for i in range(0, cur.rowcount):
@@ -666,7 +635,7 @@ def search_product():
         ch = input("Enter your choice : ")
         if ch == "1":
             while True:
-                from  tabulate import tabulate
+                from tabulate import tabulate
                 inp = int(input("Enter the Mid :"))
                 import mysql.connector as sql
                 myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
@@ -762,7 +731,7 @@ def search_product():
                         print("Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date",
                               "D_O_M", sep="\t\t\t")
                         print(
-                            "-------------------------------------------------------------------------------------------------------------------------------------------")
+                            '-------------------------------------------------------------------------------------------------------------------------------------------')
                         '''mid = data[0]
                         mname = data[1]
                         saltname = data[2]
@@ -817,7 +786,8 @@ def exp_product():
         print("No expired product exists")
     else:
         print("The details of expired products if given below : ")
-        headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", "GST", "discount"]
+        headers = ["Mid", "Mname", "Saltname", "Brandname", "Quantity", "Price", "Location", "Exp_date", "D_O_M", "GST",
+                   "discount"]
         print(tabulate(data, headers, tablefmt="grid"))
 
 
@@ -828,7 +798,8 @@ def disp_sup_order():
     cur = myql.cursor()
     cur.execute('select * from supplier_data')
     data = cur.fetchall()
-    headers = ['orderid', 'order_date', 'supplier_id', 'Mid', "Quantity", "Price", "Delievery_date", "Mname", "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status", "order_sp"]
+    headers = ['orderid', 'order_date', 'supplier_id', 'Mid', "Quantity", "Price", "Delievery_date", "Mname",
+               "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status", "order_sp"]
     print(tabulate(data, headers, tablefmt="grid"))
 
 
@@ -868,6 +839,7 @@ def stock_manage_main():
             break
         else:
             print("Please enter a valid input!")
+
 
 def list_table():
     from tabulate import tabulate
@@ -961,8 +933,8 @@ def delete_supplier():
 def list_supplier():
     from tabulate import tabulate
     headers = ["supplier_id", "supplier_name", "phone_number", "address", "supplier_gst"]
-#    print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
-#    print('-------------------------------------------------------------------------------------')
+    #    print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
+    #    print('-------------------------------------------------------------------------------------')
     import mysql.connector as sql
     myql = sql.connect(host='localhost', user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
@@ -981,6 +953,7 @@ def list_supplier():
         print(supid, supname, phno, address, supgst, sep="\t\t\t     ")
         print('-------------------------------------------------------------------------------------')
     """
+
 
 def search_supplier():
     from tabulate import tabulate
