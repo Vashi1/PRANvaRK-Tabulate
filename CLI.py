@@ -1,4 +1,5 @@
 # fixed TODO to fix the problem in the login for non-admin user
+
 def authorisation(a, b):
     # FixedTODO Fix the bug regarding non-admin users in authorisation
     # flag is for ADMIN and chkr is for password
@@ -1070,6 +1071,23 @@ def stock_manage_mini():
             break
         else:
             print("Please enter a valid input")
+
+
+# Creating the splash screen
+import Future
+root = Tkinter.Tk()
+root.overrideredirect(True)
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
+root.geometry('%dx%d+%d+%d' % (width*0.8, height*0.8, width*0.1, height*0.1))
+image_file = "LakeSplash.gif"
+image = Tkinter.PhotoImage(file=image_file)
+canvas = Tkinter.Canvas(root, height=height*0.8, width=width*0.8, bg="brown")
+canvas.create_image(width*0.8/2, height*0.8/2, image=image)
+canvas.pack()
+root.after(5000, root.destroy)
+root.mainloop()
+
 
 
 user = int(input("Enter the Userid : "))
