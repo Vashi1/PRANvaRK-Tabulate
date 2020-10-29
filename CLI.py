@@ -280,11 +280,12 @@ def add_order():
                 print("total price", total_price[0])
                 cur.execute(
                     "insert into sales values({}, '{}', {}, '{}')".format(sid, c_name, total_price[0], d1))
+                break
             f = open("Sales_id.txt", "w")
             f.write(str(sid))
             f.close()
             myql.commit()
-            break
+
         else:
             print("Please check the stocks again!")
     #   #Tp = int(input("Enter the Total Price"))
@@ -347,7 +348,7 @@ def search_order():
             print(tabulate(dat, headers, tablefmt="grid"))
         else:
             print("Please enter a valid input")
-# TODO the search module needs a rewrite
+# fixed TODO the search module needs a rewrite
 
 # Not working
 def add_sup_order():
