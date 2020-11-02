@@ -31,9 +31,9 @@ cur.execute("""create table payroll
             Password char(40) DEFAULT NULL   
             """)
 myql.commit()
-cur.execute("insert into payroll values (5, 'ADMIN', '2020-09-01', 'jammu', 123,'admin','yes', '123')")
+cur.execute("insert into payroll values (1, 'ADMIN', '2020-09-01', 'jammu', 123,'admin','yes', '123')")
 myql.commit()
-cur.execute("insert into payroll values (6, 'noadmin','2020-09-01',123,'jam',123,'rak','no','123')")
+cur.execute("insert into payroll values (2, 'noadmin','2020-09-01',123,'jam',123,'rak','no','123')")
 myql.commit()
 cur.execute("drop table if exists sales")
 myql.commit()
@@ -62,4 +62,35 @@ cur.execute("""create table stocks
 myql.commit()
 cur.execute("""drop table if exists supplier""")
 myql.commit()
-cur.execute("")
+cur.execute("""create table supplier
+                (supplier_id int DEFAULT NULL,
+                 supplier_name char(30) DEFAULT NULL,
+                phone_number int DEFAULT NULL,
+                address char(40) DEFAULT NULL,
+                supplier_gst int DEFAULT NULL""")
+myql.commit()
+cur.execute("""drop table if exists supplier_data""")
+myql.commit()
+cur.execute("""create table supplier_data
+                (orderid int DEFAULT NULL,
+                order_date date DEFAULT NULL,
+                supplier_id int DEFAULT NULL,
+                Mid int DEFAULT NULL,
+                Quantity int DEFAULT NULL,
+                Price int DEFAULT NULL,
+                Delievery_date date DEFAULT NULL,
+                Mname char(30) DEFAULT NULL,
+                Saltname char(40) DEFAULT NULL,
+                Brandname char(40) DEFAULT NULL,
+                Location char(20) DEFAULT NULL,
+                Exp_date date DEFAULT NULL,
+                GST int DEFAULT NULL,
+                discount int DEFAULT NULL,
+                status int DEFAULT NULL,
+                order_sp int DEFAULT NULL """)
+myql.commit()
+print("""Uid - 1(ADMIN)
+      Password  123
+      Uid -2 (non-admin)
+      password - 123    """)
+

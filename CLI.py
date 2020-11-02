@@ -281,6 +281,7 @@ def add_order():
                 print("total price", total_price[0])
                 cur.execute(
                     "insert into sales values({}, '{}', {}, '{}')".format(sid, c_name, total_price[0], d1))
+                myql.commit()
                 break
             f = open("Sales_id.txt", "w")
             f.write(str(sid))
