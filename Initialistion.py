@@ -1,104 +1,65 @@
-# TODO fix the initialisation script
-try:
-    with open("Flag.dat", "r") as a:
-        data = a.read()
-        if a == "1":
-            import mysql.connector as sql
-
-            myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="Medical_store")
-            cur = myql.cursor()
-            cur.execute("create database if not exists Medical_Store")
-            myql.commit()
-            cur.execute("use Medical_store")
-            cur.execute("""Create table if not exists Payroll
-            (Uid int,
-                Name char(20),
-                D_O_J date,
-                Salary int,
-                Address char(30),
-                Mobile_number int,
-                E_mail char(30),
-                ADMIN char(5),
-                Password char(20)
-             )""")
-            myql.commit()
-            cur.execute("""Create table if not exists Stocks
-            (
-               Mid int,
-            Mname char(40),
-            Saltname char(40),
-            Brandname char(40),
-            Quantity int,
-            Price int,
-            Location char(30),
-            Exp_date date,
-            D_O_P date  
-            )""")
-            myql.commit()
-            cur.execute("""reate table if not exists Sales
-            (
-                S_id int,
-                C_name char(40),
-                Date_of_sale date,
-                Total_price int,
-                GST char(20),
-                Discount int
-            )""")
-            myql.commit()
-
-
-except FileNotFoundError:
-    with open("Flag.dat", "w") as f:
-        import mysql.connector as sql
-
-        myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@")
-        cur = myql.cursor()
-        cur.execute("Create database if not exists Medical_store")
-        myql.commit()
-        cur.execute("Use Medical_store")
-        cur.execute("""Create table if not exists Payroll
-                        (Uid int,
-                        Name char(20),
-                        D_O_J date,
-                        Salary int,
-                        Address char(30),
-                        Mobile_number int,
-                        E_mail char(30),
-                        ADMIN char(5),
-                        Password char(20)
-                        )""")
-        myql.commit()
-        cur.execute("""Create table if not exists Stocks
-                        (
-                       Mid int,
-                        Mname char(40),
-                        Saltname char(40),
-                        Brandname char(40),
-                        Quantity int,
-                        Price int,
-                        Location char(30),
-                        Exp_date date,
-                        D_O_P date  
-                        )""")
-        myql.commit()
-        cur.execute("""create table if not exists Sales
-                        (
-                        S_id int,
-                        C_name char(40),
-                        Date_of_sale date,
-                        Total_price int,
-                        GST char(20),
-                        Discount int
-                        )""")
-        myql.commit()
-        cur.execute("insert into Payroll(Uid, ADMIN, Password) values(1, 'yes', 'pass')")
-        myql.commit()
-        print("Uid = 1, Password = pass")
-        a = open("Default.txt", "w")
-        data = "Uid = 1, Password = pass"
-        a.write(data)
-        a.close()
-        # fixedTODO find the bug in the code when flag.dat exists
-        a = open("Sales_id.txt", "w")
-        a.write("0")
-        a.close()
+import mysql.connector as sql
+a = input("Enter the username for MYSQL : ")
+b = input("Enter the password for MYSQL : ")
+myql = sql.connect(host="localhost", user=a, password=b)
+cur = myql.cursor()
+cur.execute("create database if not exists medical_store")
+myql.commit()
+cur.execute("DROP TABLE IF EXISTS bill_detail")
+myql.commit()
+cur.execute("""create table bill_detail
+                Bill_id int DEFAULT NULL,
+                Cust_name char(100) DEFAULT NULL,
+                bill_date date DEFAULT NULL,
+                mid int DEFAULT NULL,
+                GST_val int DEFAULT NULL,
+                Dis int DEFAULT NULL,
+                tp int DEFAULT NULL,
+                Quantity int DEFAULT NULL""")
+myql.commit()
+cur.execute("DROP TABLE IF EXISTS payroll")
+myql.commit()
+cur.execute("""create table payroll
+            Uid int DEFAULT NULL,
+            Name char(30) DEFAULT NULL,
+            D_O_J date DEFAULT NULL,
+            Salary int DEFAULT NULL,
+            Address char(40) DEFAULT NULL,
+            Mobile_number int DEFAULT NULL,
+            E_mail char(40) DEFAULT NULL,
+            ADMIN char(5) DEFAULT NULL,
+            Password char(40) DEFAULT NULL   
+            """)
+myql.commit()
+cur.execute("insert into payroll values (5, 'ADMIN', '2020-09-01', 'jammu', 123,'admin','yes', '123')")
+myql.commit()
+cur.execute("insert into payroll values (6, 'noadmin','2020-09-01',123,'jam',123,'rak','no','123')")
+myql.commit()
+cur.execute("drop table if exists sales")
+myql.commit()
+cur.execute("""create table sales
+            (sale_id int DEFAULT NULL,
+            C_name char(10) DEFAULT NULL,
+            tp int DEFAULT NULL,
+            d_o_s date DEFAULT NULL
+            """)
+myql.commit()
+cur.execute("drop table if exists stocks")
+myql.commit()
+cur.execute("""create table stocks
+           Mid int DEFAULT NULL,
+           Mname char(30) DEFAULT NULL,
+           Saltname char(40) DEFAULT NULL,
+           Brandname char(40) DEFAULT NULL,
+           Quantity int DEFAULT NULL,
+           price int DEFAULT NULL,
+           Location char(20) DEFAULT NULL,
+           Exp_date date DEFAULT NULL,
+           D_O_M date DEFAULT NULL,
+           GST int DEFAULT NULL,
+          discount int DEFAULT NULL 
+            """)
+myql.commit()
+cur.execute("""drop table if exists supplier""")
+myql.commit()
+cur.execute("")

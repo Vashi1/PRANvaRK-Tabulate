@@ -426,7 +426,6 @@ def add_sup_order():
             # location = input("Enter the storage location : ")
             # TODO add the location as "Not specified" in the query
             location = "Not specified"
-            expdate = "0000-00-00"
             dod = input("Enter the Date_of_Delievery : ")
             GST = 0
             stat = 0
@@ -1074,15 +1073,15 @@ def stock_manage_mini():
 
 
 # Creating the splash screen
-import Future
-root = Tkinter.Tk()
+import tkinter
+root = tkinter.Tk()
 root.overrideredirect(True)
 width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
 root.geometry('%dx%d+%d+%d' % (width*0.8, height*0.8, width*0.1, height*0.1))
-image_file = "LakeSplash.gif"
-image = Tkinter.PhotoImage(file=image_file)
-canvas = Tkinter.Canvas(root, height=height*0.8, width=width*0.8, bg="brown")
+image_file = "splash.png"
+image = tkinter.PhotoImage(file=image_file)
+canvas = tkinter.Canvas(root, height=height*0.8, width=width*0.8, bg="brown")
 canvas.create_image(width*0.8/2, height*0.8/2, image=image)
 canvas.pack()
 root.after(5000, root.destroy)
