@@ -357,8 +357,7 @@ def search_order():
 
 # Not working
 def add_sup_order():
-    while True:
-        choice = input("Do you want to add an existing product(1) or a non existing product(2) : ")
+        choice = input("Do you want to add an existing product(1) or a non existing product(0) : ")
         if choice == "1":
             from datetime import date
             today = date.today()
@@ -414,7 +413,7 @@ def add_sup_order():
             data = data + 1
             f.write(str(data))
             f.close()
-        elif choice == "2":
+        elif choice == "0":
             from datetime import date
             # Non-existing
             today = date.today()
@@ -423,7 +422,9 @@ def add_sup_order():
             f = open("Supply.txt", "r+")
             data = int(f.read())
             f.close()
-            mid = 0
+            f = open("Mid.txt", 'r+')
+            mid = int(f.read())
+            f.close()
             mname = input("Enter the Mname : ")
             salt_nme = input("Enter the salt name : ")
             b_name = input("Enter the Brand name : ")
@@ -454,21 +455,18 @@ def add_sup_order():
             data = data + 1
             f.write(str(data))
             f.close()
-        ch = input("Do you want to continue(y/n) : ")
-        if ch == "y":
-            pass
-        elif ch == "n":
+            f = open("Mid.txt", "w+")
+            mid += 1
+            f.write(str(mid))
+            f.close()
             a = open("order_sp.txt", "w")
             order_sp += 1
             a.write(str(order_sp))
             a.close()
-            break
-        else:
-            print("Please enter a valid input!")
 
 
 # TODO module needs a rewrite
-def recieve_sup_order():
+'''def recieve_sup_order():
     osp = int(input("Enter the order_sp : "))
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
@@ -482,9 +480,9 @@ def recieve_sup_order():
         data1 = cur.fetchall()
         print(data)  # TODO remove this print call
         # TODO fix this print statement
-        '''headers = ["orderid", "order_date", "supplier_id", "Mid", "Quantity", "Price", "Delievery_date", "Mname",
+        headers = ["orderid", "order_date", "supplier_id", "Mid", "Quantity", "Price", "Delievery_date", "Mname",
                    "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status", "order_sp"]
-        print(tabulate([data1], headers, tablefmt="grid"))'''
+        print(tabulate([data1], headers, tablefmt="grid"))
         choice1 = input("Do you want to continue(y/n) :")
         if choice1.lower() == "y":
             cur.execute("select order_sp, status, Mid from supplier_data where order_sp = {}".format(osp))
@@ -555,12 +553,11 @@ def recieve_sup_order():
             print("bye") #TODO delete this
         else:
             print("Please enter a Valid Input!")
+'''
 
 
-
-'''def recieve_sup_order():
-    oid0 = int(input("Enter the order_id : "))
-    oid = 0
+def recieve_sup_order():
+    oid0 = int(input("Enter the order_sp : "))
     import mysql.connector as sql
     myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
@@ -568,12 +565,14 @@ def recieve_sup_order():
         "select orderid, order_date, supplier_id, Mid, Quantity, Price, Delievery_date from supplier_data where order_sp = {}".format(
             oid0))
     data = cur.fetchall()
+    #print(data)
     if data == None or data == []:
         print("The Table is empty")
     else:
         print("The data is shown below :-")
-        print("orderid", "order_date", 'supplier_id', "Quantity", "Price", "Delievery_date", sep='\t\t')
+        print("order_sp", "order_date", 'supplier_id', "Quantity", "Price", "Delivery_date", sep='\t\t')
         for i in range(0, cur.rowcount):
+            print(i)
             oid = data[i][0]
             odate = data[i][1]
             supid = data[i][2]
@@ -588,26 +587,24 @@ def recieve_sup_order():
             ch = input("Do you want to continue(y/n) : ")
             if ch == "y":
                 cur.execute("select status from supplier_data where orderid = {}".format(oid))
-                data = cur.fetchall()
-                print(data)
-                if data[0][0] == 1:
-                    cur.execute('select Mid, Quantity, Saltname from supplier_data where Mid = {}'.format(mid))
+                dat = cur.fetchall()
+                print(dat)
+                if dat[0][0] == 1:
+                    cur.execute('select Mid, Quantity, Saltname from supplier_data where orderid = {}'.format(oid))
                     data_sup_data = cur.fetchall()
                     for i in range(0, cur.rowcount):
                         mid = data_sup_data[i][0]
+                        print(mid)
                         quan = data_sup_data[i][1]
                         cur.execute("update stocks set Quantity = Quantity + {} where Mid = {}".format(quan, mid))
+                        # TODO uncomment myql.commit()
+                        #cur.execute("update supplier_data set status = 2 where orderid = {}".format(oid))
                         myql.commit()
-                        cur.execute("update supplier_data set status = 2 where orderid = {}".format(oid))
-                        myql.commit()
-                elif data[0][0] == 0:
+                elif dat[0][0] == 0:
                     cur.execute(
                         "select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data where order_sp = {}".format(
                             oid0))
                     data_sup_data = cur.fetchall()
-                    f = open("Mid.txt", "r")
-                    daa = int(f.read())
-                    f.close()
                     for i in range(0, cur.rowcount):
                         mname = data_sup_data[i][1]
                         s_nme = data_sup_data[i][2]
@@ -620,7 +617,7 @@ def recieve_sup_order():
                         gst = int(input("Enter the GST value : "))
                         disco = int(input("Enter the discount value : "))
                         cur.execute(
-                            "insert into stocks values({}, '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', {}, {})".format(daa,
+                            "insert into stocks values({}, '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', {}, {})".format(mid,
                                                                                                                        mname,
                                                                                                                        s_nme,
                                                                                                                        bname,
@@ -633,16 +630,12 @@ def recieve_sup_order():
                                                                                                                        disco))
                         myql.commit()
                         print(cur.rowcount)
-                        cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
+                       # cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
                         myql.commit()
-                        f = open("Mid.txt", "w")
-                        daa += 1
-                        f.write(str(daa))
-                        f.close()
-                elif data[0][0] == 2:
+                elif dat[0][0] == 2:
                     print("The order is already added")
             if ch == "n":
-                pass'''
+                pass
 
 
 def list_product():
