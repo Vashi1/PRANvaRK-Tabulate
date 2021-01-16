@@ -1,6 +1,3 @@
-# fixed TODO to fix the problem in the login for non-admin user
-
-
 def authorisation(a, b):
     # FixedTODO Fix the bug regarding non-admin users in authorisation
     # flag is for ADMIN and chkr is for password
@@ -26,12 +23,9 @@ def authorisation(a, b):
                 flag = 1
         elif data != b:
             print("The Password is incorrect")
-    # FixedTODO remove debugging prints after this
-
     return flag, chkr
 
 
-# fixed TODO Show Password and Admin
 def list_user():
     import mysql.connector as sql
     from tabulate import tabulate
@@ -75,7 +69,6 @@ def add_usr():
         print("Please input the following data!")
         f = open("uid.txt", "r+")
         data = int(f.read())
-        #        uid = int(input("Enter the Uid : "))
         name = input("Enter the name : ")
         d_o_j = input("Enter the Date of joining : ")
         salary = int(input("Enter the salary : "))
@@ -138,7 +131,6 @@ def editusr():
             elif cho2 == "n":
                 myql.close()
                 break
-            # fixedTODO fix the problem with edit module for different datatypes
         elif clmn == "Uid":
             print("ERROR! Uid cannot be changed")
             break
@@ -173,7 +165,6 @@ def srch_usr():
                     print(tabulate(data, headers, tablefmt="grid"))
         elif cho3 == 3:
             break
-        # fixedTODO fix the bug in search by mname and saltname
         elif cho3 == 2:
             uid2 = input("Enter the Username : ")
             import mysql.connector as sql
@@ -187,7 +178,6 @@ def srch_usr():
                 print("The user does not exists")
             elif data is not None:
                 print("The user exists")
-                # The admi will tell whether the logged in user has admin rights
                 cho4 = input("Do you want to view further details(y/n) : ")
                 if cho4 == "y":
                     headers = ["Uid", "Name", "D_O_J", "Salary", "Address", "Mobile_number", "E_mail", "ADMIN"]
@@ -225,21 +215,10 @@ def add_order():
     cur = myql.cursor()
     print("Enter the following data :-")
     sid = f + 1
-    # fixedTODO to store sid in a text file
     c_name = input("Enter the customer name : ")
-    # D_O_s = input("Enter the date : ")
-    # gst = int(input("Enter the GST Percentage : "))
-    # discount = int(input("Enter the discount per piece(if any) : "))
     while True:
         tp = 0
-        # TODO add a case when the mid does not exists
         gtp = 0
-        """cur.execute("Select Mname, Quantity from stocks")
-        data = cur.fetchall()
-        print("Available Stock")
-        print("Mname", "Quantity", sep="\t")"""
-        # for i in data:
-        # print(i)
         mid = input("Enter the Mid of the product : ")
         cur.execute("select Quantity from stocks where mid = {}".format(mid))
         daa = cur.fetchall()
@@ -290,10 +269,7 @@ def add_order():
                 break
         else:
             print("Please check the stocks again!")
-    #   #Tp = int(input("Enter the Total Price"))
 
-
-# fixedTODO add order recieve order
 
 def sales_manage_main():
     while True:
@@ -353,9 +329,6 @@ def search_order():
             print("Please enter a valid input")
 
 
-# fixed TODO the search module needs a rewrite
-
-# Not working
 def add_sup_order():
         choice = input("Do you want to add an existing product(1) or a non existing product(0) : ")
         if choice == "1":
@@ -363,7 +336,6 @@ def add_sup_order():
             today = date.today()
             d1 = today.strftime("%Y-%m-%d")
             print("Enter the following data!")
-            # midi = int(input("Enter the Mid : "))
             f = open("Supply.txt", "r+")
             data = int(f.read())
             f.close()
@@ -439,10 +411,6 @@ def add_sup_order():
             discount = 0
             a = open("order_sp.txt", "r+")
             order_sp = int(a.read())
-            # TODO add the discount as 0
-            # supid = input("Enter the supplier id : ")
-            # supname = input("Enter the supplier name : ")
-            # sup_gst = input("Enter supplier's GST number")
             import mysql.connector as sql
             myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
             cur = myql.cursor()
@@ -463,97 +431,6 @@ def add_sup_order():
             order_sp += 1
             a.write(str(order_sp))
             a.close()
-
-
-# TODO module needs a rewrite
-'''def recieve_sup_order():
-    osp = int(input("Enter the order_sp : "))
-    import mysql.connector as sql
-    myql = sql.connect(host="localhost", user="Rakshith", password="Rakshith1@", database="medical_store")
-    cur = myql.cursor()
-    cur.execute('select * from supplier_data where order_sp = {}'.format(osp))
-    data = cur.fetchall()
-    if data == []:
-        print("No such record exists")
-    else:
-        cur.execute('select * from supplier_data where order_sp = {}'.format(osp))
-        data1 = cur.fetchall()
-        print(data)  # TODO remove this print call
-        # TODO fix this print statement
-        headers = ["orderid", "order_date", "supplier_id", "Mid", "Quantity", "Price", "Delievery_date", "Mname",
-                   "Saltname", "Brandname", "Location", "Exp_date", "GST", "discount", "status", "order_sp"]
-        print(tabulate([data1], headers, tablefmt="grid"))
-        choice1 = input("Do you want to continue(y/n) :")
-        if choice1.lower() == "y":
-            cur.execute("select order_sp, status, Mid from supplier_data where order_sp = {}".format(osp))
-            data = cur.fetchall()
-            print(data)
-            for i in range(0, cur.rowcount):
-                ordersp = data[i][0]
-                status = data[i][1]
-                md = data[i][2]
-                if status == 2:
-                    print("The order is already added!")
-                    break
-                elif status == 1:
-                    print("Adding an existing order")
-                    cur.execute("select orderid, Quantity from supplier_data where Mid = {}".format(md))
-                    recieve_data = cur.fetchall()
-                    oid = recieve_data[0]
-                    quan = recieve_data[1]
-                    cur.execute("update stocks set Quantity = Quantity + {} where Mid = {}".format(quan, md))
-                    myql.commit()
-                    cur.execute("update supplier_data set status = 2 where orderid = {}".format(oid))
-                    myql.commit()
-
-                elif status == 0:
-                    print("ADding a new order")
-                    cur.execute(
-                        "select Mid, Mname, Saltname, Brandname, Quantity, Price, Location, Exp_date, order_date, GST, discount from supplier_data where order_sp = {}".format(
-                            osp))
-                    data_sup_data = cur.fetchall()
-                    f = open("Mid.txt", "r")
-                    daa = int(f.read())
-                    f.close()
-                    for i in range(0, cur.rowcount):
-                        mname = data_sup_data[i][1]
-                        s_nme = data_sup_data[i][2]
-                        bname = data_sup_data[i][3]
-                        quant = data_sup_data[i][4]
-                        pric = data_sup_data[i][5]
-                        loca = data_sup_data[i][6]
-                        expdata = input("Enter the expiry date :")
-                        order_da = data_sup_data[i][8]
-                        gst = int(input("Enter the GST value : "))
-                        disco = int(input("Enter the discount value : "))
-                        cur.execute(
-                            "insert into stocks values({}, '{}', '{}', '{}', {}, {}, '{}', '{}', '{}', {}, {})".format(daa,
-                                                                                                                       mname,
-                                                                                                                       s_nme,
-                                                                                                                       bname,
-                                                                                                                       quant,
-                                                                                                                       pric,
-                                                                                                                       loca,
-                                                                                                                       expdata,
-                                                                                                                       order_da,
-                                                                                                                       gst,
-                                                                                                                       disco))
-                        myql.commit()
-                        print(cur.rowcount)
-                        cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
-                        myql.commit()
-                        f = open("Mid.txt", "w")
-                        daa += 1
-                        f.write(str(daa))
-                        f.close()
-                else:
-                    print("Please enter a valid input!")
-                    break
-        elif choice1.lower() == "n":
-            print("bye") #TODO delete this
-        else:
-            print("Please enter a Valid Input!")
-'''
 
 
 def recieve_sup_order():
@@ -580,7 +457,6 @@ def recieve_sup_order():
             quan = data[i][4]
             price = data[i][5]
             Delievery_date = data[i][6]
-            # fixedTODO add the field name
             print(
                 "------------------------------------------------------------------------------------------------------------------------------------------------------------------")
             print(oid0, odate, supid, quan, price, Delievery_date, sep="\t\t")
@@ -597,8 +473,7 @@ def recieve_sup_order():
                         print(mid)
                         quan = data_sup_data[i][1]
                         cur.execute("update stocks set Quantity = Quantity + {} where Mid = {}".format(quan, mid))
-                        # TODO uncomment myql.commit()
-                        #cur.execute("update supplier_data set status = 2 where orderid = {}".format(oid))
+                        cur.execute("update supplier_data set status = 2 where orderid = {}".format(oid))
                         myql.commit()
                 elif dat[0][0] == 0:
                     cur.execute(
@@ -630,7 +505,7 @@ def recieve_sup_order():
                                                                                                                        disco))
                         myql.commit()
                         print(cur.rowcount)
-                       # cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
+                        cur.execute("update supplier_data set status = 2 where order_sp = {}".format(oid0))
                         myql.commit()
                 elif dat[0][0] == 2:
                     print("The order is already added")
@@ -652,21 +527,6 @@ def list_product():
         headers = ["Mid", "Mname", "Sname", "Bname", "quantity", "price", 'location', "EXP_date",
                    'date of manufacturing', "GST", "discount"]
         print(tabulate(data, headers, tablefmt="grid"))
-
-        """for i in range(0, cur.rowcount):
-            mid = data[i][0]
-            mname = data[i][1]
-            sname = data[i][2]
-            bname = data[i][3]
-            quan = data[i][4]
-            price = data[i][5]
-            location = data[i][6]
-            expdata = data[i][7]
-            D_O_M = data[i][8]
-            # fixedTODO add the field name
-            print(
-                "------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-            print(mid, mname, sname, bname, quan, price, location, expdata, D_O_M, sep="\t\t")"""
 
 
 def edit_product():
@@ -770,9 +630,6 @@ def search_product():
                 cur = myql.cursor()
                 cur.execute("select * from stocks where Mname = '{}'".format(mname))
                 data = cur.fetchall()
-                # ad = 0
-                # for i in data:
-                #   ad = i
                 if data is None or data == []:
                     print("The product is not available in inventory")
                     break
@@ -959,8 +816,6 @@ def database_manage_main():
 def user_manage_mini():
     while True:
         print("\t\t\t1.Search User")
-        # fixedTODO Fix the edit user information and all other modules
-        # fixedTODO FIX search User
         print("\t\t\t2.Back To Main Menu")
         cho_usr = input("Enter your choice :")
         if cho_usr == "1":
@@ -977,7 +832,6 @@ def add_supplier():
         f = open("Supplier.txt", "r+")
         data = int(f.read())
         f.close()
-        #        sup_id = int(input("Enter the Supplier_id")
         sup_nme = input("Enter the supplier name : ")
         p_no = int(input("Enter the phone number : "))
         address = input("Enter the address : ")
@@ -1024,8 +878,6 @@ def delete_supplier():
 def list_supplier():
     from tabulate import tabulate
     headers = ["supplier_id", "supplier_name", "phone_number", "address", "supplier_gst"]
-    #    print('supplier_id', 'supplier_name', 'phone_number', 'address', 'supplier_gst', sep="\t\t")
-    #    print('-------------------------------------------------------------------------------------')
     import mysql.connector as sql
     myql = sql.connect(host='localhost', user="Rakshith", password="Rakshith1@", database="medical_store")
     cur = myql.cursor()
@@ -1035,15 +887,6 @@ def list_supplier():
         print("No record exists")
     else:
         print(tabulate(data, headers, tablefmt="grid"))
-    """for i in range(0, cur.rowcount):
-        supid = data[i][0]
-        supname = data[i][1]
-        phno = data[i][2]
-        address = data[i][3]
-        supgst = data[i][4]
-        print(supid, supname, phno, address, supgst, sep="\t\t\t     ")
-        print('-------------------------------------------------------------------------------------')
-    """
 
 
 def search_supplier():
@@ -1143,7 +986,6 @@ def supplier_management():
 
 def stock_manage_mini():
     while True:
-        # FixedTODO Exp_product and list products
         print("Main True")
         print("\t\t\t1.Search Product")
         print("\t\t\t2.View all expired products")
@@ -1162,7 +1004,6 @@ def stock_manage_mini():
             print("Please enter a valid input")
 
 
-# Creating the splash screen
 import tkinter
 
 root = tkinter.Tk()
