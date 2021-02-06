@@ -759,14 +759,12 @@ def stock_manage_main():
         print("\t\t\t3.Modify Product")
         print("\t\t\t4.Search Product")
         print("\t\t\t5.Delete Product ")
-        # fixedTODO add a module to show all expired products
         print("\t\t\t6.Show Expired Products")
         print("\t\t\t7.Receive Supply Order")
         print("\t\t\t8.Show all supplier orders")
         print("\t\t\t9.Back(Main Menu)")
         ch1 = input("\t\tEnter your choice : ")
         if ch1 == "1":
-            # Doesn't Work anymore
             add_sup_order()
         elif ch1 == "2":
             list_product()
